@@ -11,7 +11,7 @@
     
     <!-- Meta tags importantes -->
     <meta name="description" content="Notificação de compra aprovada - Banco do Brasil">
-    <meta name="theme-color" content="#FFCC29">
+    <meta name="theme-color" content="#FBCE07">
 
     <!-- OneSignal -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -32,15 +32,15 @@
         }
         
         .bb-yellow {
-            background-color: #FFCC29;
+            background-color: #FBCE07;
         }
         
         .bb-yellow-text {
-            color: #FFCC29;
+            color: #FBCE07;
         }
         
         .bb-yellow-dark {
-            background-color: #E6B825;
+            background-color: #E8BE06;
         }
         
         .bb-blue {
@@ -52,17 +52,17 @@
         }
         
         .btn-telefone {
-            background-color: #FFCC29;
+            background-color: #FBCE07;
             transition: all 0.3s ease;
         }
         
         .btn-telefone:hover {
-            background-color: #E6B825;
+            background-color: #E8BE06;
             transform: scale(1.02);
         }
         
         .security-badge {
-            background: linear-gradient(135deg, #FFCC29 0%, #FFD95A 100%);
+            background: linear-gradient(135deg, #FBCE07 0%, #FDD835 100%);
         }
         
         .modal-overlay {
@@ -112,13 +112,13 @@
         
         @keyframes pulse {
             0% {
-                box-shadow: 0 0 0 0 rgba(255, 204, 41, 0.4);
+                box-shadow: 0 0 0 0 rgba(251, 206, 7, 0.4);
             }
             70% {
-                box-shadow: 0 0 0 10px rgba(255, 204, 41, 0);
+                box-shadow: 0 0 0 10px rgba(251, 206, 7, 0);
             }
             100% {
-                box-shadow: 0 0 0 0 rgba(255, 204, 41, 0);
+                box-shadow: 0 0 0 0 rgba(251, 206, 7, 0);
             }
         }
         
@@ -142,7 +142,7 @@
             width: 50px;
             height: 50px;
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #FFCC29;
+            border-top: 4px solid #FBCE07;
             border-bottom: 4px solid #0033A0;
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -154,16 +154,17 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* Header gradient */
-        .bb-header-gradient {
-            background: linear-gradient(135deg, #FFCC29 0%, #FFD95A 100%);
-        }
-        
         /* Estilo para número de telefone */
         .phone-number {
             font-family: monospace;
             letter-spacing: 1px;
             font-weight: bold;
+        }
+        
+        /* Estilo para o logo */
+        .logo-img {
+            filter: none;
+            mix-blend-mode: normal;
         }
     </style>
 </head>
@@ -177,22 +178,22 @@
     
     <!-- Conteúdo principal (inicialmente oculto) -->
     <div id="mainContent" class="hidden">
-        <!-- HEADER BANCO DO BRASIL -->
-        <header class="sticky top-0 z-10 p-4 sm:p-6 bb-header-gradient shadow-sm">
+        <!-- HEADER BANCO DO BRASIL BRANCO -->
+        <header class="sticky top-0 z-10 p-4 sm:p-6 bg-white shadow-sm">
             <nav class="flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <!-- Logo do Banco do Brasil - usando imagem local -->
                     <img src="./logo-brasil.png" 
-                         class="w-28 sm:w-32 h-auto" 
+                         class="w-28 sm:w-32 h-auto logo-img" 
                          alt="Banco do Brasil"
-                         onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 60\"><rect width=\"200\" height=\"60\" fill=\"%23FFCC29\"/><text x=\"100\" y=\"40\" font-family=\"Arial\" font-size=\"24\" fill=\"black\" text-anchor=\"middle\</text></svg>
+                         onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 60\"><rect width=\"200\" height=\"60\" fill=\"white\"/><text x=\"100\" y=\"40\" font-family=\"Arial\" font-size=\"24\" fill=\"%23FBCE07\" text-anchor=\"middle\" font-weight=\"bold\"></text></svg>
                     <div>
-                        <h1 class="text-black text-xl font-bold">Banco do Brasil</h1>
-                        <p class="text-black/80 text-sm">Compra Aprovada</p>
+                        <h1 class="text-gray-800 text-xl font-bold">Banco do Brasil</h1>
+                        <p class="text-gray-600 text-sm">Compra Aprovada</p>
                     </div>
                 </div>
-                <div class="text-sm text-black/90 hidden sm:block">
-                    <span id="currentDate"></span>
+                <div class="text-sm text-gray-600 hidden sm:block">
+                    <span id="currentDate">Terça-feira, 6 de janeiro de 2026</span>
                 </div>
             </nav>
         </header>
@@ -221,7 +222,7 @@
                 </div>
 
                 <!-- CARD PRINCIPAL -->
-                <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-t-4 border-[#FFCC29]">
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-t-4 border-[#FBCE07]">
                     <!-- Cabeçalho do card -->
                     <div class="p-6 border-b">
                         <div class="flex items-center justify-between">
@@ -233,7 +234,7 @@
                                 </div>
                             </div>
                             <div class="text-right">
-                                <p class="text-gray-600 text-sm" id="currentDayDate">Hoje</p>
+                                <p class="text-gray-600 text-sm" id="currentDayDate">Terça-feira</p>
                                 <p class="font-bold text-lg" id="currentTime">12:53</p>
                             </div>
                         </div>
@@ -355,7 +356,7 @@
                 <!-- Botões do modal -->
                 <div class="flex flex-col gap-3">
                     <button onclick="makeCall('auto-modal')" 
-                            class="w-full bb-yellow text-black py-3 rounded-lg font-bold hover:bg-[#E6B825] transition flex items-center justify-center gap-2">
+                            class="w-full bb-yellow text-black py-3 rounded-lg font-bold hover:bg-[#E8BE06] transition flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
                         </svg>
@@ -446,7 +447,7 @@
 
                 <div class="mt-6 pt-4 border-t">
                     <button onclick="closeSecurityModal()" 
-                            class="w-full bb-yellow text-black py-3 rounded-lg font-bold hover:bg-[#E6B825] transition">
+                            class="w-full bb-yellow text-black py-3 rounded-lg font-bold hover:bg-[#E8BE06] transition">
                         Entendi, obrigado
                     </button>
                 </div>
@@ -465,9 +466,6 @@
                     document.getElementById('loadingScreen').style.display = 'none';
                     document.getElementById('mainContent').classList.remove('hidden');
                     
-                    // Inicializar data e hora
-                    updateDateTime();
-                    
                     // Timer para abrir modal automático após 5 segundos
                     autoModalTimer = setTimeout(() => {
                         openAutoCallModal();
@@ -479,38 +477,6 @@
         
         // Variáveis globais
         let autoModalTimer = null;
-        
-        // Inicializar data e hora
-        function updateDateTime() {
-            const now = new Date();
-            
-            // Atualizar data no header
-            const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-            const formattedDate = now.toLocaleDateString('pt-BR', optionsDate);
-            const dateElement = document.getElementById('currentDate');
-            if (dateElement) {
-                dateElement.textContent = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
-            }
-            
-            // Atualizar "Hoje" no card
-            const optionsShort = { weekday: 'long' };
-            const dayName = now.toLocaleDateString('pt-BR', optionsShort);
-            const dayDateElement = document.getElementById('currentDayDate');
-            if (dayDateElement) {
-                dayDateElement.textContent = dayName.charAt(0).toUpperCase() + dayName.slice(1);
-            }
-            
-            // Atualizar hora no card
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const timeElement = document.getElementById('currentTime');
-            if (timeElement) {
-                timeElement.textContent = `${hours}:${minutes}`;
-            }
-        }
-        
-        // Atualizar a cada minuto
-        setInterval(updateDateTime, 60000);
         
         // Modal functions
         function openAutoCallModal() {
